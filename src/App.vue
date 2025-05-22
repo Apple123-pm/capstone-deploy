@@ -4,7 +4,7 @@
     <section>
       <h1>Factory 4.0</h1>
       <h2>Station: {{ firstname }}</h2>
-      <h3>Station: {{ firstname }}</h3>
+      <h3>Station: {{ name }}</h3>
     </section>
     <ul>
       <li v-for="(item, index) in items" :key="index">
@@ -36,20 +36,22 @@ export default {
   data() {
     return {
       items: [], // Data fetched from the database
-      firstname: "Station 1", // Station name
+      firstname: "Station_1", // Station name
     };
   },
   
   created() {
     // Fetch data from the Node.js backend
     axios
-      .post("http://localhost:3000/fetchall") // Node.js backend URL
-      .then((response) => {
-        this.items = response.data; // Store the fetched data in items
-      })
-      .catch((error) => {
-        console.error("Error fetching data:", error);
-      });
+    .get("http://localhost:3000/fetchall") // เปลี่ยนจาก .post เป็น .get
+    .then((response) => {
+      this.items = response.data; // Store the fetched data in items
+      console.log("✅ Data fetched:", this.items); // เพิ่ม Log เช็กข้อมูล
+    })
+    .catch((error) => {
+      console.error("❌ Error fetching data:", error);
+    });
+
   },
 };
 </script>
@@ -60,24 +62,35 @@ export default {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  color: #00ff1a;
   margin-top: 60px;
 }
 section {
   padding: 20px;
-  background-color: #f9f9f9;
+  background-color: #e61010;
 }
 ul {
   padding: 20px;
-  background-color: #f9f9f9;
+  background-color: #f9fbfc;
   list-style: none;
 }
 li {
   font-size: 1.2rem;
-  color: #333;
+  color: #971c1c;
 }
 h1 {
   font-size: 2rem;
-  color: #3498db;
+  color: #010d15;
 }
+
+table td, table th {
+  text-align: center;     /* จัดกลางแนวนอน */
+  vertical-align: middle; /* จัดกลางแนวตั้ง */
+}
+
+.col-No { width: 5%; }
+.col-Date { width: 10%; }
+.col-Timestamp { width: 10%; }
+.col-Cycle { width: 5%; }
+
 </style>

@@ -1,129 +1,215 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+<head>
     <meta charset="utf-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" href="<%= BASE_URL %>favicon.ico" />
-    <title>Fetch Data with Sidebar</title>
+    <title>Manufacturing Automation and Robotic Engineering</title>
 
     <!-- Bootstrap CSS -->
-    <link
-      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
-      rel="stylesheet"
-    />
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
 
     <!-- Vue.js -->
     <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 
     <!-- Axios -->
     <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
-  </head>
-  <body>
-    <div id="crudApp" class="container-fluid">
-      <div class="row">
-        <!-- Sidebar -->
-        <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
-          <div class="position-sticky">
-            <ul class="nav flex-column">
-              <li class="nav-item">
-                <!-- ใช้ @click เพื่อเรียก navigateToNextPage -->
-                <a href="#" class="nav-link active" @click="navigateToNextPage">
-                  <i data-feather="home"></i>
-                  <span>MRP Factory 4.0</span>
-                </a>
-              </li>
-              
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i data-feather="file"></i>
-                  <span>Reports</span>
-                </a>
-              </li>
-              <li class="nav-item">
-                <a href="#" class="nav-link">
-                  <i data-feather="settings"></i>
-                  <span>Settings</span>
-                </a>
-              </li>
-            </ul>
-          </div>
-        </nav>
 
-        <!-- Main Content -->
-        <main class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
-          <h3 class="mt-4 text-center">Factory 4.0</h3>
-          <h3 class="mt-4 text-center">Station 1</h3>
-          <div class="table-responsive mt-4">
-            <table class="table table-bordered table-striped">
-              <thead>
-                <tr>
-                  <th>No.</th>
-                  <th>Date</th>
-                  <th>Timestamp</th>
-                  <th>Cycle Time(sec)</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(row, index) in allData" :key="index">
-                  <td>{{ index + 1 }}</td>
-                  <td>{{ formatDate(row.date) }}</td>
-                  <td>{{ row.timestamp }}</td>
-                  <td>{{ row.cycletime }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </main>
-      </div>
+    <!-- เช็กการล็อกอิน -->
+    <script>
+        if (!localStorage.getItem("isLoggedIn")) {
+            window.location.href = "login.html"; // ถ้ายังไม่ได้ล็อกอิน ให้ไปที่หน้า Login
+        }
+    </script>
+
+    <link rel="stylesheet" href="index.css" />
+
+    
+</head>
+<body>
+    
+
+    <div id="crudApp" class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+                <div class="position-sticky">
+                    <ul class="nav flex-column">
+
+                        <li class="nav-item">
+                            <a href="index.html" class="nav-link">
+                                <i data-feather="home"></i>
+                                <span>HOME</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="#submenuMRP" class="nav-link" data-toggle="collapse">
+                                <i data-feather="file"></i>
+                                <span>MRP Factory 4.0</span>
+                            </a>
+                            <div class="collapse" id="submenuMRP">
+                                <ul class="nav flex-column pl-3">
+                                    <li class="nav-item"><a href="overview_mrp.html" class="nav-link">Overview</a></li>
+                                    <li class="nav-item"><a href="station_1.html" class="nav-link">Station 1</a></li>
+                                    <li class="nav-item"><a href="station_2.html" class="nav-link">Station 2</a></li>
+                                    <li class="nav-item"><a href="station_3.html" class="nav-link">Station 3</a></li>
+                                    <li class="nav-item"><a href="station_4_NG.html" class="nav-link">Station 4 NG</a></li>
+                                    <li class="nav-item"><a href="station_4_OK.html" class="nav-link">Station 4 OK</a></li>
+                                    <li class="nav-item"><a href="station_5.html" class="nav-link">Station 5</a></li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#submenuCONWIP" class="nav-link" data-toggle="collapse">
+                                <i data-feather="file"></i>
+                                <span>CONWIP Factory 4.0</span>
+                            </a>
+                            <div class="collapse" id="submenuCONWIP">
+                                <ul class="nav flex-column pl-3">
+                                    <li class="nav-item"><a href="overview_conwip.html" class="nav-link">Overview</a></li>
+                                    <li class="nav-item"><a href="station_01.html" class="nav-link">Station 1</a></li>
+                                    <li class="nav-item"><a href="station_02.html" class="nav-link">Station 2</a></li>
+                                    <li class="nav-item"><a href="station_03.html" class="nav-link">Station 3</a></li>
+                                    <li class="nav-item"><a href="station_04_NG.html" class="nav-link">Station 4 NG</a></li>
+                                    <li class="nav-item"><a href="station_04_OK.html" class="nav-link">Station 4 OK</a></li>
+                                    <li class="nav-item"><a href="station_05.html" class="nav-link">Station 5</a></li>
+                                </ul>
+                            </div>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i data-feather="settings"></i>
+                                <span>Settings</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="change_password.html" class="nav-link">
+                                <i data-feather="key"></i>
+                                <span>Change Password</span>
+                            </a>
+                        </li>
+                        <!-- ปุ่ม Logout -->
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" @click="logout">
+                                <i data-feather="log-out"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+                <div class="container">
+                    <div class="image-gallery1">
+                        <img src="pic11.png" alt="Image1">
+                    </div>
+                    <div class="image-gallery2">
+                        <img src="pic4.png" alt="Image2">
+                    </div>
+
+                    <h1 >Manufacturing Automation and Robotic Engineering</h1>
+                    <h2 >Electronic CONWIP for Autonomous Automation System Prototype</h2>
+                    <h2 >Group_04 Coven</h2>
+                
+
+                <!-- Table for fetched data -->
+                <!-- <div class="table-responsive mt-4" style="width: 60%; margin: auto;"> -->
+                    <!-- <table class="table table-bordered table-striped" style="width: 100%;"> -->
+                        <!-- <thead> -->
+                            <!-- <tr> -->
+                                <!-- <th class="col-No">No.</th> -->
+                                <!-- <th class="col-Date">Date</th> -->
+                                <!-- <th class="col-Timestamp">Timestamp</th> -->
+                                <!-- <th class="col-Cycle Time">Cycle Time(sec)</th> -->
+                            <!-- </tr> -->
+                        <!-- </thead> -->
+                        <!-- <tbody> -->
+                            <!-- <tr v-for="(row, index) in allData" :key="index"> -->
+                                <!-- <td class="col-No">{{ row.No  }}</td> -->
+                                <!-- <td class="col-Date">{{ formatDate(row.date) }}</td> -->
+                                <!-- <td class="col-Timestamp">{{ row.timestamp }}</td> -->
+                                <!-- <td class="col-Cycle">{{ row.cycletime }}</td> -->
+                            <!-- </tr> -->
+                        <!-- </tbody> -->
+                    <!-- </table> -->
+                <!-- </div> -->
+
+                <!-- ปุ่มควบคุมการทำงานของเครื่องจักร -->
+                <!-- <div class="text-center my-3"> -->
+                    <!-- <button @click="controlMachine('start')" class="btn btn-success mr-2">Start Machine</button> -->
+                    <!-- <button @click="controlMachine('stop')" class="btn btn-danger">Stop Machine</button> -->
+                <!-- </div> -->
+
+                <!-- แสดงผลสถานะของเครื่องจักร -->
+                <!-- <div class="alert text-center mt-3" :class="machineStatusClass"> -->
+                    <!-- {{ machineStatus }} -->
+                <!-- </div> -->
+            </main>
+        </div>
     </div>
 
     <!-- Vue.js Application -->
     <script>
-      var application = new Vue({
-        el: "#crudApp",
-        data: {
-          allData: [], // Array to store fetched data
-        },
-        methods: {
-          fetchAllData: function () {
-            axios
-              .post("http://localhost:3000/fetchall") // URL ของ backend
-              .then((response) => {
-                this.allData = response.data; // เก็บข้อมูลในตัวแปร allData
-              })
-              .catch((error) => {
-                console.error("Error fetching data:", error);
-              });
-          },
-          formatDate: function (dateString) {
-            if (!dateString) return ""; // กรณีข้อมูลวันที่ว่าง
-            const date = new Date(dateString);
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, "0");
-            const day = String(date.getDate()).padStart(2, "0");
-            return `${year}/${month}/${day}`;
-          },
-          navigateToNextPage: function () {
-            // ฟังก์ชันเปลี่ยนหน้าไปยัง station_1.html
-            window.location.href = "station_1.html";
-          },
-        },
-        created: function () {
-          this.fetchAllData(); // Fetch data when the app is created
-        },
-      });
+        var application = new Vue({
+            el: "#crudApp",
+            data: {
+                allData: [], // Store fetched data
+                machineStatus: "Machine is OFF", // Default status
+                machineStatusClass: "alert-secondary", // Default status color
+            },
+            methods: {
+                fetchAllData: function () {
+                    axios
+                        .get("http://localhost:3000/fetchall")
+                        .then((response) => {
+                            this.allData = response.data;
+                            console.log("✅ Data fetched:", this.allData);
+                        })
+                        .catch((error) => {
+                            console.error("❌ Error fetching data:", error);
+                        });
+                },
+                logout: function () {
+                    localStorage.removeItem("isLoggedIn");
+                    window.location.href = "login.html";
+                },
+                formatDate: function (dateString) {
+                    const options = { year: "numeric", month: "long", day: "numeric" };
+                    return new Date(dateString).toLocaleDateString("en-US", options);
+                },
+                controlMachine: function (command) {
+                    if (command === "start") {
+                        this.machineStatus = "Machine is Running";
+                        this.machineStatusClass = "alert-success";
+                    } else if (command === "stop") {
+                        this.machineStatus = "Machine is Stopped";
+                        this.machineStatusClass = "alert-danger";
+                    }
+                    console.log(`Machine command: ${command}`);
+                }
+            },
+            created: function () {
+                this.fetchAllData();
+            },
+        });
     </script>
 
-    <!-- Feather Icons -->
-    <script src="https://cdn.jsdelivr.net/npm/feather-icons/dist/feather.min.js"></script>
-    <script>
-      feather.replace(); // Initialize Feather icons
-    </script>
+    <!-- Bootstrap Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
 
     <!-- Bootstrap JS -->
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-  </body>
+    <script src="https://unpkg.com/feather-icons"></script>
+    <script>
+        feather.replace();
+    </script>
+
+</body>
 </html>
