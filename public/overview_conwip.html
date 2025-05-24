@@ -284,12 +284,12 @@
                 selectedDate: '',               // วันที่ที่เลือกจาก date picker
                 filteredTableData: [],          // ข้อมูลตารางที่ถูกกรองตามวันที่
                 filteredAllData: [],
-    filteredStation2Data: [],
-    filteredStation3Data: [],
-    filteredStation4_okData: [],
-    filteredStation4_ngData: [],
-    filteredStation5Data: [],
-    chart1: null, // ✅ เพิ่ม chart1
+                filteredStation2Data: [],
+                filteredStation3Data: [],
+                filteredStation4_okData: [],
+                filteredStation4_ngData: [],
+                filteredStation5Data: [],
+                chart1: null, // ✅ เพิ่ม chart1
 
                 
 
@@ -459,18 +459,18 @@ this.renderAllCharts();
                     }, 0);
 
                     const allStations = [
-    this.filteredAllData,
-    this.filteredStation2Data,
-    this.filteredStation3Data,
-    this.filteredStation4_okData,
-    this.filteredStation4_ngData,
-    this.filteredStation5Data
-];
+                    this.filteredAllData,
+                    this.filteredStation2Data,
+                    this.filteredStation3Data,
+                    this.filteredStation4_okData,
+                    this.filteredStation4_ngData,
+                    this.filteredStation5Data
+                    ];
 
                     const allUnits = Math.max(...allStations.map(station => station.length));
 
                     const totalUnits = this.filteredStation4_okData.length + this.filteredStation4_ngData.length;
-const goodUnits = this.filteredStation4_okData.length;
+                    const goodUnits = this.filteredStation4_okData.length;
 
                     const idealCycleTime = 130.2; // วินาทีต่อหน่วย
 
@@ -824,39 +824,39 @@ const goodUnits = this.filteredStation4_okData.length;
                     
             computed: {
                 averageCycleTime() {
-    if (this.filteredAllData.length === 0) return 0;
-    const totalCycleTime = this.filteredAllData.reduce((sum, item) => sum + parseFloat(item.cycletime), 0);
-    return totalCycleTime / this.filteredAllData.length;
-},
+                    if (this.filteredAllData.length === 0) return 0;
+                        const totalCycleTime = this.filteredAllData.reduce((sum, item) => sum + parseFloat(item.cycletime), 0);
+                    return totalCycleTime / this.filteredAllData.length;
+                },
                 averageCycleTimeStation2() {
-    if (this.filteredStation2Data.length === 0) return 0;
-    const totalCycleTime = this.filteredStation2Data.reduce((sum, item) => sum + parseFloat(item.cycletime), 0);
-    return totalCycleTime / this.filteredStation2Data.length;
-},
+                    if (this.filteredStation2Data.length === 0) return 0;
+                        const totalCycleTime = this.filteredStation2Data.reduce((sum, item) => sum + parseFloat(item.cycletime), 0);
+                    return totalCycleTime / this.filteredStation2Data.length;
+                },
 
-averageCycleTimeStation3() {
-    if (this.filteredStation3Data.length === 0) return 0;
-    const totalCycleTime = this.filteredStation3Data.reduce((sum, item) => sum + parseFloat(item.cycletime), 0);
-    return totalCycleTime / this.filteredStation3Data.length;
-},
+                averageCycleTimeStation3() {
+                    if (this.filteredStation3Data.length === 0) return 0;
+                        const totalCycleTime = this.filteredStation3Data.reduce((sum, item) => sum + parseFloat(item.cycletime), 0);
+                    return totalCycleTime / this.filteredStation3Data.length;
+                },
 
-averageCycleTimeStation4_ok() {
-    if (this.filteredStation4_okData.length === 0) return 0;
-    const totalCycleTime = this.filteredStation4_okData.reduce((sum, item) => sum + parseFloat(item.cycletime), 0);
-    return totalCycleTime / this.filteredStation4_okData.length;
-},
+                averageCycleTimeStation4_ok() {
+                    if (this.filteredStation4_okData.length === 0) return 0;
+                        const totalCycleTime = this.filteredStation4_okData.reduce((sum, item) => sum + parseFloat(item.cycletime), 0);
+                    return totalCycleTime / this.filteredStation4_okData.length;
+                },
 
-averageCycleTimeStation4_ng() {
-    if (this.filteredStation4_ngData.length === 0) return 0;
-    const totalCycleTime = this.filteredStation4_ngData.reduce((sum, item) => sum + parseFloat(item.cycletime), 0);
-    return totalCycleTime / this.filteredStation4_ngData.length;
-},
+                averageCycleTimeStation4_ng() {
+                    if (this.filteredStation4_ngData.length === 0) return 0;
+                        const totalCycleTime = this.filteredStation4_ngData.reduce((sum, item) => sum + parseFloat(item.cycletime), 0);
+                    return totalCycleTime / this.filteredStation4_ngData.length;
+                },
 
-averageCycleTimeStation5() {
-    if (this.filteredStation5Data.length === 0) return 0;
-    const totalCycleTime = this.filteredStation5Data.reduce((sum, item) => sum + parseFloat(item.cycletime), 0);
-    return totalCycleTime / this.filteredStation5Data.length;
-},
+                averageCycleTimeStation5() {
+                    if (this.filteredStation5Data.length === 0) return 0;
+                        const totalCycleTime = this.filteredStation5Data.reduce((sum, item) => sum + parseFloat(item.cycletime), 0);
+                    return totalCycleTime / this.filteredStation5Data.length;
+                },
                 
             },
             
