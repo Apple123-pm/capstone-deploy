@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manufacturing Automation and Robotic Engineering</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Vue.js -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+    <!-- Axios -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+    <!-- Graph -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- เช็กการล็อกอิน -->
+    <script>
+        if (!localStorage.getItem("isLoggedIn")) {
+            window.location.href = "login.html"; // ถ้ายังไม่ได้ล็อกอิน ให้ไปที่หน้า Login
+        }
+    </script>
+    
+</head>
+<body>
+    <div id="crudApp" class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+                <div class="position-sticky">
+                    <ul class="nav flex-column">
+
+                        <li class="nav-item">
+                            <a href="index.html" class="nav-link">
+                                <i data-feather="home"></i>
+                                <span>HOME</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="#submenuMRP" class="nav-link" data-toggle="collapse">
+                                <i data-feather="file"></i>
+                                <span>MRP Factory 4.0</span>
+                            </a>
+                            <div class="collapse" id="submenuMRP">
+                                <ul class="nav flex-column pl-3">
+                                    <li class="nav-item"><a href="overview_mrp.html" class="nav-link">Overview</a></li>
+                                    <li class="nav-item"><a href="station_1.html" class="nav-link">Station 1</a></li>
+                                    <li class="nav-item"><a href="station_2.html" class="nav-link">Station 2</a></li>
+                                    <li class="nav-item"><a href="station_3.html" class="nav-link">Station 3</a></li>
+                                    <li class="nav-item"><a href="station_4_NG.html" class="nav-link">Station 4 NG</a></li>
+                                    <li class="nav-item"><a href="station_4_OK.html" class="nav-link">Station 4 OK</a></li>
+                                    <li class="nav-item"><a href="station_5.html" class="nav-link">Station 5</a></li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#submenuCONWIP" class="nav-link" data-toggle="collapse">
+                                <i data-feather="file"></i>
+                                <span>CONWIP Factory 4.0</span>
+                            </a>
+                            <div class="collapse" id="submenuCONWIP">
+                                <ul class="nav flex-column pl-3">
+                                    <li class="nav-item"><a href="overview_conwip.html" class="nav-link">Overview</a></li>
+                                    <li class="nav-item"><a href="station_01.html" class="nav-link">Station 1</a></li>
+                                    <li class="nav-item"><a href="station_02.html" class="nav-link">Station 2</a></li>
+                                    <li class="nav-item"><a href="station_03.html" class="nav-link">Station 3</a></li>
+                                    <li class="nav-item"><a href="station_04_NG.html" class="nav-link">Station 4 NG</a></li>
+                                    <li class="nav-item"><a href="station_04_OK.html" class="nav-link">Station 4 OK</a></li>
+                                    <li class="nav-item"><a href="station_05.html" class="nav-link">Station 5</a></li>
+                                </ul>
+                            </div>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i data-feather="settings"></i>
+                                <span>Settings</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="change_password.html" class="nav-link">
+                                <i data-feather="key"></i>
+                                <span>Change Password</span>
+                            </a>
+                        </li>
+                        <!-- ปุ่ม Logout -->
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" @click="logout">
+                                <i data-feather="log-out"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+                <h3 class="mt-4 text-center">Factory 4.0 MRP: Station 1 Distribution</h3>
+                <!-- <h3 class="mt-4 text-center">Station 1 Distribution</h3> -->
+                <h4 class="mt-4 text-center">AVG cycle time: {{ averageCycleTime.toFixed(2) }} sec</h4>
+
+
+                <!-- Chart Canvas -->
+                <div class="mt-5" style="width: 50%; margin: auto;">
+                    <h5 class="text-center">กราฟแสดง cycle time ของชิ้นงานแต่ละชิ้น</h5>
+                    <canvas id="cycleTimeChart"></canvas>
+                </div>
+
+
+                <div class="text-center mt-4">
+                    <label for="selectedDate">เลือกวันที่:</label>
+                    <input type="date" id="selectedDate" v-model="selectedDate" @change="filterDataByDate">
+                </div>
+
+
+                <!-- Table for fetched data -->
+                <div class="table-responsive mt-4" style="width: 60%; margin: auto;">
+                    <table class="table table-bordered table-striped" style="width: 100%;">
+                        <thead>
+                            <tr class="text-center">
+                                <th class="col-No">No.</th>
+                                <th class="col-Date">Date</th>
+                                <th class="col-Timestamp">Timestamp</th>
+                                <th class="col-Cycle Time">Cycle Time(sec)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-center">
+                            <tr v-for="(row, index) in filteredData" :key="index">
+                                <td class="col-No">{{ row.No  }}</td>
+                                <!-- <td class="col-Date">{{ formatDate(row.date) }}</td> -->
+                                 <td class="col-Date">{{ new Date(row.date).toLocaleDateString('ja-JP') }}</td>
+                                <td class="col-Timestamp">{{ row.timestamp }}</td>
+                                <td class="col-Cycle">{{ row.cycletime }}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+               
+            </main>
+        </div>
+    </div>
+
+    <!-- Vue.js Application -->
+    <script>
+        var application = new Vue({
+            el: "#crudApp",
+            data: {
+                allData: [], // Store fetched data
+                filteredData: [],
+                machineStatus: "Machine is OFF", // Default status
+                machineStatusClass: "alert-secondary", // Default status color
+                chart: null, // เพิ่มตัวนี้ไว้ใน data หลัก
+                selectedDate: "", // <-- สำหรับเก็บวันที่ที่เลือก
+            },
+            methods: {
+                fetchAllData: function () {
+                    axios
+                      .get("http://localhost:3000/station_1_MRP") // เปลี่ยน URL ให้ตรงกับ API route
+                      .then((response) => {
+                        this.allData = response.data;
+                        this.filteredData = this.allData; // ตั้งค่าเริ่มต้น
+                        this.renderChart(); // เรียกหลังได้ข้อมูล.....................................................
+                      })
+                      .catch((error) => {
+                        console.error("❌ Error fetching data:", error);
+                      });
+                  },
+
+                  filterDataByDate: function () {
+                    const selected = this.selectedDate;
+                    if (!selected) {
+                        this.filteredData = this.allData;
+                        this.renderChart(); // แสดงทั้งหมด
+                        return;
+                    }
+
+                    // รูปแบบจาก input date คือ 'yyyy-MM-dd' ต้องแปลงให้ตรงกับ 'ja-JP' -> 'yyyy/MM/dd'
+                    const formattedSelected = new Date(selected).toLocaleDateString('ja-JP');
+
+                    this.filteredData = this.allData.filter(item => {
+                        const itemDate = new Date(item.date).toLocaleDateString('ja-JP');
+                        return itemDate === formattedSelected;
+                    });
+
+                    this.renderChart(true); // ส่ง true เพื่อให้ใช้ filteredData
+                },
+
+
+
+                  renderChart: function (useFiltered = false) {
+                    const sourceData = useFiltered ? this.filteredData : this.allData;
+
+                    const labels = sourceData.map(item => item.timestamp);
+                    const data = sourceData.map(item => item.cycletime);
+
+                    const ctx = document.getElementById('cycleTimeChart').getContext('2d');
+
+                    if (this.chart) this.chart.destroy();
+
+                    this.chart = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: labels.reverse(),
+                            datasets: [{
+                            label: 'Cycle Time (sec)',
+                            data: data.reverse(),
+                            fill: false,
+                            borderColor: 'rgb(75, 192, 192)',
+                            tension: 0.3,
+                            pointRadius: 3,
+                            pointBackgroundColor: '#007bff',
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'timestamp'
+                                }
+                            },
+                            y: {
+                                title: {
+                                    display: true,
+                                    text: 'Cycle Time (sec)'
+                                },
+                                min: 0.00,
+                                max: 50.00,
+                                ticks: {
+                                    stepSize: 0.500
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: true
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                            }
+                        }
+                    }
+                });
+            },
+
+
+
+                logout: function () {
+                    localStorage.removeItem("isLoggedIn");
+                    window.location.href = "login.html";
+                },
+                formatDate: function (dateString) {
+                    const options = { year: "numeric", month: "long", day: "numeric" };
+                    return new Date(dateString).toLocaleDateString("en-US", options);
+                },
+                controlMachine: function (command) {
+                    if (command === "start") {
+                        this.machineStatus = "Machine is Running";
+                        this.machineStatusClass = "alert-success";
+                    } else if (command === "stop") {
+                        this.machineStatus = "Machine is Stopped";
+                        this.machineStatusClass = "alert-danger";
+                    }
+                    console.log(`Machine command: ${command}`);
+                }
+            },
+            computed: {
+                averageCycleTime() {
+                    if (this.filteredData.length === 0) return 0;
+            
+                    const totalCycleTime = this.filteredData.reduce((sum, item) => sum + parseFloat(item.cycletime), 0);
+                    const avg = totalCycleTime / this.filteredData.length;
+                    return avg;
+                }
+            },
+            
+            created: function () {
+                this.fetchAllData();
+            },
+
+
+            
+        });
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>

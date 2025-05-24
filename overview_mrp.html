@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manufacturing Automation and Robotic Engineering</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet" />
+
+    <!-- Vue.js -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+
+    <!-- Axios -->
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+
+    <!-- Graph -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+
+    <!-- เช็กการล็อกอิน -->
+    <script>
+        if (!localStorage.getItem("isLoggedIn")) {
+            window.location.href = "login.html"; // ถ้ายังไม่ได้ล็อกอิน ให้ไปที่หน้า Login
+        }
+    </script>
+    
+</head>
+<body>
+    <div id="crudApp" class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <nav id="sidebar" class="col-md-3 col-lg-2 d-md-block bg-light sidebar">
+                <div class="position-sticky">
+                    <ul class="nav flex-column">
+
+                        <li class="nav-item">
+                            <a href="index.html" class="nav-link">
+                                <i data-feather="home"></i>
+                                <span>HOME</span>
+                            </a>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="#submenuMRP" class="nav-link" data-toggle="collapse">
+                                <i data-feather="file"></i>
+                                <span>MRP Factory 4.0</span>
+                            </a>
+                            <div class="collapse" id="submenuMRP">
+                                <ul class="nav flex-column pl-3">
+                                    <li class="nav-item"><a href="overview_mrp.html" class="nav-link">Overview</a></li>
+                                    <li class="nav-item"><a href="station_1.html" class="nav-link">Station 1</a></li>
+                                    <li class="nav-item"><a href="station_2.html" class="nav-link">Station 2</a></li>
+                                    <li class="nav-item"><a href="station_3.html" class="nav-link">Station 3</a></li>
+                                    <li class="nav-item"><a href="station_4_NG.html" class="nav-link">Station 4 NG</a></li>
+                                    <li class="nav-item"><a href="station_4_OK.html" class="nav-link">Station 4 OK</a></li>
+                                    <li class="nav-item"><a href="station_5.html" class="nav-link">Station 5</a></li>
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="nav-item">
+                            <a href="#submenuCONWIP" class="nav-link" data-toggle="collapse">
+                                <i data-feather="file"></i>
+                                <span>CONWIP Factory 4.0</span>
+                            </a>
+                            <div class="collapse" id="submenuCONWIP">
+                                <ul class="nav flex-column pl-3">
+                                    <li class="nav-item"><a href="overview_conwip.html" class="nav-link">Overview</a></li>
+                                    <li class="nav-item"><a href="station_01.html" class="nav-link">Station 1</a></li>
+                                    <li class="nav-item"><a href="station_02.html" class="nav-link">Station 2</a></li>
+                                    <li class="nav-item"><a href="station_03.html" class="nav-link">Station 3</a></li>
+                                    <li class="nav-item"><a href="station_04_NG.html" class="nav-link">Station 4 NG</a></li>
+                                    <li class="nav-item"><a href="station_04_OK.html" class="nav-link">Station 4 OK</a></li>
+                                    <li class="nav-item"><a href="station_05.html" class="nav-link">Station 5</a></li>
+                                </ul>
+                            </div>
+                        </li>
+
+                        <li class="nav-item">
+                            <a href="#" class="nav-link">
+                                <i data-feather="settings"></i>
+                                <span>Settings</span>
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a href="change_password.html" class="nav-link">
+                                <i data-feather="key"></i>
+                                <span>Change Password</span>
+                            </a>
+                        </li>
+                        <!-- ปุ่ม Logout -->
+                        <li class="nav-item">
+                            <a href="#" class="nav-link" @click="logout">
+                                <i data-feather="log-out"></i>
+                                <span>Logout</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+
+            <!-- Main Content -->
+            <main class="col-md-9 ml-sm-auto col-lg-10 px-md-4">
+                <h3 class="mt-4 text-center">Factory 4.0 MRP</h3>
+                <!-- <h3 class="mt-4 text-center">Station 1 Distribution</h3> -->
+                
+
+                <!-- กราฟ Station 1-3 แสดงในแถวเดียวกัน -->
+                <div class="row mt-5 text-center">
+                    <div class="col-md-4">
+                        <h5>กราฟแสดง cycle time ของ Station 1</h5>
+                        <h4 class="mt-4 text-center">AVG cycle time: {{ averageCycleTime.toFixed(2) }} sec</h4>
+                        <canvas id="cycleTimeChart"></canvas>
+                    </div>
+                    <div class="col-md-4">
+                        <h5>กราฟแสดง cycle time ของ Station 2</h5>
+                        <h4 class="mt-4 text-center">AVG cycle time: {{ averageCycleTimeStation2.toFixed(2) }} sec</h4>
+                        <canvas id="cycleTimeChart2"></canvas>
+                    </div>
+                    <div class="col-md-4">
+                        <h5>กราฟแสดง cycle time ของ Station 3</h5>
+                        <h4 class="mt-4 text-center">AVG cycle time: {{ averageCycleTimeStation3.toFixed(2) }} sec</h4>
+                        <canvas id="cycleTimeChart3"></canvas>
+                    </div>
+                </div>
+
+                <!-- กราฟ Station 4-5 แสดงในแถวเดียวกัน -->
+                <div class="row mt-5 text-center">
+                    <div class="col-md-4">
+                        <h5>กราฟแสดง cycle time ของ Station 4 OK</h5>
+                        <h4 class="mt-4 text-center">AVG cycle time: {{ averageCycleTimeStation4_ok.toFixed(2) }} sec</h4>
+                        <canvas id="cycleTimeChart4_ok"></canvas>
+                    </div>
+                    <div class="col-md-4">
+                        <h5>กราฟแสดง cycle time ของ Station 4 NG</h5>
+                        <h4 class="mt-4 text-center">AVG cycle time: {{ averageCycleTimeStation4_ng.toFixed(2) }} sec</h4>
+                        <canvas id="cycleTimeChart4_ng"></canvas>
+                    </div>
+                    <div class="col-md-4">
+                        <h5>กราฟแสดง cycle time ของ Station 5</h5>
+                        <h4 class="mt-4 text-center">AVG cycle time: {{ averageCycleTimeStation5.toFixed(2) }} sec</h4>
+                        <canvas id="cycleTimeChart5"></canvas>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="downtimeInput">เวลาหยุดเครื่อง (นาที):</label>
+                    <input type="number" id="downtimeInput" class="form-control" v-model.number="downtimeMinutes" @input="calculateOEE" min="0" />
+                </div>
+
+                
+
+                <div v-if="oee">
+                    <h4>ค่า OEE: {{ oee.toFixed(2) }}%</h4>
+                </div>
+
+                <div>
+                    <p><strong>Availability:</strong> {{ availability.toFixed(2) }}%</p>
+                    <p><strong>Performance:</strong> {{ performance.toFixed(2) }}%</p>
+                    <p><strong>Quality:</strong> {{ quality.toFixed(2) }}%</p>
+                    <p><strong>OEE:</strong> {{ oee.toFixed(2) }}%</p>
+                </div>
+
+                <!-- Chart ของ Station 4 ok -->
+                <!-- <div class="mt-5" style="width: 25%; margin: auto;"> -->
+                    <!-- <h5 >กราฟแสดง cycle time ของ Station 4 OK</h5> -->
+                    <!-- <canvas id="cycleTimeChart4_ok"></canvas> -->
+                <!-- </div> -->
+
+                <div class="form-group mt-4">
+  <label for="filterDate">กรองตามวันที่:</label>
+  <input type="date" id="filterDate" v-model="selectedDate" class="form-control" @change="filterByDate">
+</div>
+
+
+                <div class="row mt-5">
+                    <div class="col">
+                        <h4 class="text-center">ตารางแสดงข้อมูลการผลิตชิ้นงานดีตั้งแต่ Station 1 ถึง Station 5</h4>
+                        <table class="table table-bordered mt-3">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">No</th>
+                                    <th class="text-center">Date</th> <!-- 👈 เพิ่มตรงนี้ -->
+                                    <th class="text-center">in Station 1 </th>
+                                    <th class="text-center">out Station 1 </th>
+                                    <th class="text-center">in Station 2 </th>
+                                    <th class="text-center">out Station 2</th>
+                                    <th class="text-center">in Station 3 </th>
+                                    <th class="text-center">out Station 3</th>
+                                    <th class="text-center">in Station 4 ok </th>
+                                    <th class="text-center">out Station 4 ok</th>
+                                    <th class="text-center">in Station 5 </th>
+                                    <th class="text-center">out Station 5</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                <tr v-for="row in filteredTableData" :key="row.timestamp_station1">
+                                    <td class="text-center" class="col-No">{{ row.timestamp_station1_No}}</td>
+                                    <td class="text-center">{{ formatDate(row.timestamp_station1) }}</td> <!-- 👈 เพิ่มตรงนี้ -->
+                                    <td class="text-center">{{ row.timestamp_station1_in }}</td>
+                                    <td class="text-center">{{ row.timestamp_station1 }}</td>
+                                    <td class="text-center">{{ row.timestamp_station2_in }}</td>
+                                    <td class="text-center">{{ row.timestamp_station2 }}</td>
+                                    <td class="text-center">{{ row.timestamp_station3_in }}</td>
+                                    <td class="text-center">{{ row.timestamp_station3 }}</td>
+                                    <td class="text-center">{{ row.timestamp_station4_ok_in }}</td>
+                                    <td class="text-center">{{ row.timestamp_station4_ok }}</td>
+                                    <td class="text-center">{{ row.timestamp_station5_in }}</td>
+                                    <td class="text-center">{{ row.timestamp_station5 }}</td>
+                                </tr>
+                              </tbody>
+                        </table>
+                    </div>
+                </div>
+
+              
+               
+            </main>
+        </div>
+    </div>
+
+    <!-- Vue.js Application -->
+    <script>
+        var application = new Vue({
+            el: "#crudApp",
+            data: {
+                allData: [], // Store fetched data
+                station2Data: [],     
+                station3Data: [],   
+                station4_okData: [],   
+                station4_ngData: [],    
+                station5Data: [],      // ✅ เพิ่มตรงนี้
+                mergedData: [],       // 🆕 ตารางที่รวมข้อมูลทั้งสอง
+                chart: null, // เพิ่มตัวแปรเก็บกราฟ
+                chart2: null, 
+                chart3: null,  
+                chart4_ok: null,  
+                chart4_ng: null,  
+                chart5: null,              // ✅ เพิ่มตรงนี้
+                downtimeMinutes: 0,
+                oee: 0,
+                availability: 0,
+                performance: 0,
+                quality: 0,
+                selectedDate: '', // วันที่ที่เลือก
+filteredTableData: [], // เก็บข้อมูลที่กรองแล้ว
+
+                
+            },
+            methods: {
+                fetchAllData: function () {
+                    // Station 1
+                    axios
+                      .get("http://localhost:3000/station_1_MRP") // เปลี่ยน URL ให้ตรงกับ API route
+                      .then((response) => {
+                        this.allData = response.data;
+                        this.renderChart(); // เรียกหลังได้ข้อมูล.....................................................
+                      })
+                      .catch((error) => {
+                        console.error("❌ Error fetching data:", error);
+                      });
+
+                      // Station 2
+                    axios
+                        .get("http://localhost:3000/station2_MRP") // เปลี่ยน URL ตามจริง
+                        .then((response) => {
+                        this.station2Data = response.data;
+                        this.renderChart2(); // แสดงกราฟ Station 2
+                     })
+                    .catch((error) => {
+                        console.error("❌ Error fetching Station 2 data:", error);
+                    });
+
+                    // Station 3
+                    axios
+                        .get("http://localhost:3000/station3_MRP") // เปลี่ยน URL ตามจริง
+                        .then((response) => {
+                        this.station3Data = response.data;
+                        this.renderChart3(); // แสดงกราฟ Station 3
+                     })
+                    .catch((error) => {
+                        console.error("❌ Error fetching Station 3 data:", error);
+                    });
+
+                    // Station 4 ok
+                    axios
+                        .get("http://localhost:3000/station4_MRP_OK") // เปลี่ยน URL ตามจริง
+                        .then((response) => {
+                        this.station4_okData = response.data;
+                        this.renderChart4_ok(); // แสดงกราฟ Station 4_ok
+                     })
+                    .catch((error) => {
+                        console.error("❌ Error fetching Station 4_ok data:", error);
+                    });
+
+                    // Station 4 ng
+                    axios
+                        .get("http://localhost:3000/station4_MRP_NG") // เปลี่ยน URL ตามจริง
+                        .then((response) => {
+                        this.station4_ngData = response.data;
+                        this.renderChart4_ng(); // แสดงกราฟ Station 4_ng
+                     })
+                    .catch((error) => {
+                        console.error("❌ Error fetching Station 4_ng data:", error);
+                    });
+
+                    // Station 5
+                    axios
+                        .get("http://localhost:3000/station5_MRP") // เปลี่ยน URL ตามจริง
+                        .then((response) => {
+                        this.station5Data = response.data;
+                        this.renderChart5(); // แสดงกราฟ Station 5
+                     })
+                    .catch((error) => {
+                        console.error("❌ Error fetching Station 5 data:", error);
+                    });
+
+                    
+                  },
+
+                  filterByDate() {
+                    if (!this.selectedDate) {
+                        this.filteredTableData = this.combinedTableData;
+                    return;
+                }
+
+                    const selected = this.selectedDate;
+                    this.filteredTableData = this.combinedTableData.filter(item => {
+                    const formatted = this.formatDate(item.timestamp_station1); // ใช้ฟังก์ชันที่มีอยู่แล้ว
+                    return formatted === selected.replace(/-/g, '/'); // เปรียบเทียบเป็น "YYYY/MM/DD"
+                });
+            },
+
+                filterBySelectedDate(dataArray) {
+                if (!this.selectedDate) return dataArray;
+
+                const selected = this.selectedDate.replace(/-/g, '/'); // เปรียบเทียบเป็น "YYYY/MM/DD"
+
+                return dataArray.filter(item => {
+                const formatted = this.formatDate(item.timestamp); // หรือ item.timestamp_station1
+                return formatted === selected;
+                });
+                },
+
+                filterAllDataBySelectedDate() {
+                    if (!this.selectedDate) {
+        // 👉 ถ้ายังไม่เลือกวันที่ ให้ใช้ข้อมูลทั้งหมด
+        return {
+            allData: this.allData,
+            station2Data: this.station2Data,
+            station3Data: this.station3Data,
+            station4_okData: this.station4_okData,
+            station4_ngData: this.station4_ngData,
+            station5Data: this.station5Data,
+        };
+    }
+                    const date = this.selectedDate.replace(/-/g, '/'); // "YYYY/MM/DD"
+                    const formatFn = this.formatDate;
+
+                    const filterFn = (arr) => {
+                        return arr.filter(item => formatFn(item.timestamp || item.start_time) === date);
+                    };
+
+                    return {
+                        allData: filterFn(this.allData),
+                        station2Data: filterFn(this.station2Data),
+                        station3Data: filterFn(this.station3Data),
+                        station4_okData: filterFn(this.station4_okData),
+                        station4_ngData: filterFn(this.station4_ngData),
+                        station5Data: filterFn(this.station5Data)
+                    };
+                },
+
+                  
+
+                  calculateOEE: function () {
+    const plannedProductionTime = 7 * 60 * 60; // 7 ชั่วโมง
+    const downtimeSeconds = this.downtimeMinutes * 60;
+    const runTime = plannedProductionTime - downtimeSeconds;
+
+    // 👇 กรองข้อมูลตามวันที่
+    const {
+        allData,
+        station2Data,
+        station3Data,
+        station4_okData,
+        station4_ngData,
+        station5Data
+    } = this.filterAllDataBySelectedDate();
+
+    const allCycleData = [
+        ...allData,
+        ...station2Data,
+        ...station3Data,
+        ...station4_okData,
+        ...station4_ngData,
+        ...station5Data
+    ];
+
+    const totalCycleTime = allCycleData.reduce((sum, item) => {
+        const cycleTime = parseFloat(item.cycletime);
+        return sum + (isNaN(cycleTime) ? 0 : cycleTime);
+    }, 0);
+
+    const totalUnits = station4_okData.length + station4_ngData.length;
+    const goodUnits = station4_okData.length;
+    const idealCycleTime = 130.2;
+
+    const availabilityRaw = plannedProductionTime > 0 ? runTime / plannedProductionTime : 0;
+    const performanceRaw = runTime > 0 ? (totalUnits * idealCycleTime) / runTime : 0;
+    const qualityRaw = totalUnits > 0 ? goodUnits / totalUnits : 0;
+
+    this.availability = availabilityRaw * 100;
+    this.performance = Math.max(0, performanceRaw * 100);
+    this.quality = qualityRaw * 100;
+    this.oee = availabilityRaw * performanceRaw * qualityRaw * 100;
+
+                    console.log("Availability:", this.availability.toFixed(2), "%");
+                    console.log("Performance:", this.performance.toFixed(2), "%");
+                    console.log("Quality:", this.quality.toFixed(2), "%");
+                    console.log("📅 [Filtered Date] OEE:", this.oee.toFixed(2));
+                    },
+
+                  fetchStation5Data: function () {
+                    axios
+                      .get("http://localhost:3000/station5_MRP") // เปลี่ยน URL ให้ตรงกับ API
+                      .then((response) => {
+                        this.station5Data = response.data;
+                        this.combineStation1And5(); // เรียกฟังก์ชันรวมข้อมูลหลังโหลดเสร็จ
+                      })
+                      .catch((error) => {
+                        console.error("❌ Error fetching Station 5 data:", error);
+                      });
+                },
+                
+                combineStation1And5: function () {
+                    this.combinedTableData = [];
+                    this.filteredTableData = this.combinedTableData; // ตั้งค่าเริ่มต้น
+
+                  
+                    // สร้าง Map จาก No เพื่อ lookup ข้อมูลเร็ว
+                    const mapStation1 = new Map(this.allData.map(item => [item.No, item]));
+                    const mapStation2 = new Map(this.station2Data.map(item => [item.No, item]));
+                    const mapStation3 = new Map(this.station3Data.map(item => [item.No, item]));
+                    const mapStation4_OK = new Map(this.station4_okData.map(item => [item.No, item]));
+                    const mapStation5 = new Map(this.station5Data.map(item => [item.No, item]));
+                  
+                    // วนลูปจาก station1 เป็นหลัก เพราะมันมักเป็นข้อมูลต้นทาง
+                    for (const [No, station1] of mapStation1.entries()) {
+                      const station2 = mapStation2.get(No);
+                      const station3 = mapStation3.get(No);
+                      const station4 = mapStation4_OK.get(No);
+                      const station5 = mapStation5.get(No);
+                  
+                      // เช็คว่ามีข้อมูลทุก station ก่อน push
+                      if (station1 && station2 && station3 && station4 && station5) {
+                        this.combinedTableData.push({
+                          timestamp_station1_No: No,
+                          timestamp_station1_in: station1.start_time,
+                          timestamp_station1: station1.timestamp,
+                          timestamp_station2_in: station2.start_time,
+                          timestamp_station2: station2.timestamp,
+                          timestamp_station3_in: station3.start_time,
+                          timestamp_station3: station3.timestamp,
+                          timestamp_station4_ok_in: station4.start_time,
+                          timestamp_station4_ok: station4.timestamp,
+                          timestamp_station5_in: station5.start_time,
+                          timestamp_station5: station5.timestamp,
+                        });
+                      }
+                    }
+                  
+                    console.log("✅ Combined Filtered Data:", this.combinedTableData);
+                  }
+                  ,
+
+
+                  renderChart: function () {
+    const filtered = this.filterBySelectedDate(this.allData);
+    const labels = filtered.map(item => item.timestamp);
+    const data = filtered.map(item => item.cycletime);
+
+    const ctx = document.getElementById('cycleTimeChart').getContext('2d');
+    if (this.chart) this.chart.destroy();
+
+    this.chart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels.reverse(),
+            datasets: [{
+                label: 'Cycle Time (sec)',
+                data: data.reverse(),
+                fill: false,
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.3,
+                pointRadius: 3,
+                pointBackgroundColor: '#007bff',
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: { title: { display: true, text: 'timestamp' }},
+                y: { title: { display: true, text: 'Cycle Time (sec)' }, min: 0, max: 200.0, ticks: { stepSize: 0.5 }}
+            },
+            plugins: { legend: { display: true }, tooltip: { mode: 'index', intersect: false }}
+        }
+    });
+}
+,
+
+                renderChart2: function () {
+    const filtered = this.filterBySelectedDate(this.station2Data); // สำหรับ renderChart2
+    const labels = filtered.map(item => item.timestamp);
+    const data = filtered.map(item => item.cycletime);
+
+    const ctx = document.getElementById('cycleTimeChart2').getContext('2d');
+    if (this.chart2) this.chart2.destroy();
+
+    this.chart2 = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels.reverse(),
+            datasets: [{
+                label: 'Cycle Time (sec)',
+                data: data.reverse(),
+                fill: false,
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.3,
+                pointRadius: 3,
+                pointBackgroundColor: '#007bff',
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: { title: { display: true, text: 'timestamp' }},
+                y: { title: { display: true, text: 'Cycle Time (sec)' }, min: 0, max: 200.0, ticks: { stepSize: 0.5 }}
+            },
+            plugins: { legend: { display: true }, tooltip: { mode: 'index', intersect: false }}
+        }
+    });
+}
+,
+
+                renderChart3: function () {
+    const filtered = this.filterBySelectedDate(this.station3Data); // สำหรับ renderChart3
+    const labels = filtered.map(item => item.timestamp);
+    const data = filtered.map(item => item.cycletime);
+
+    const ctx = document.getElementById('cycleTimeChart3').getContext('2d');
+    if (this.chart3) this.chart3.destroy();
+
+    this.chart3 = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels.reverse(),
+            datasets: [{
+                label: 'Cycle Time (sec)',
+                data: data.reverse(),
+                fill: false,
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.3,
+                pointRadius: 3,
+                pointBackgroundColor: '#007bff',
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: { title: { display: true, text: 'timestamp' }},
+                y: { title: { display: true, text: 'Cycle Time (sec)' }, min: 0, max: 200.0, ticks: { stepSize: 0.5 }}
+            },
+            plugins: { legend: { display: true }, tooltip: { mode: 'index', intersect: false }}
+        }
+    });
+},
+
+                renderChart4_ok: function () {
+    const filtered = this.filterBySelectedDate(this.station4_okData); // สำหรับ renderChart4_ok
+    const labels = filtered.map(item => item.timestamp);
+    const data = filtered.map(item => item.cycletime);
+
+    const ctx = document.getElementById('cycleTimeChart4_ok').getContext('2d');
+    if (this.chart4_ok) this.chart4_ok.destroy();
+
+    this.chart4_ok = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels.reverse(),
+            datasets: [{
+                label: 'Cycle Time (sec)',
+                data: data.reverse(),
+                fill: false,
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.3,
+                pointRadius: 3,
+                pointBackgroundColor: '#007bff',
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: { title: { display: true, text: 'timestamp' }},
+                y: { title: { display: true, text: 'Cycle Time (sec)' }, min: 0, max: 200.0, ticks: { stepSize: 0.5 }}
+            },
+            plugins: { legend: { display: true }, tooltip: { mode: 'index', intersect: false }}
+        }
+    });
+}
+,
+
+                renderChart4_ng: function () {
+                    const filtered = this.filterBySelectedDate(this.station4_ngData); // สำหรับ renderChart4_ng
+                    const labels = filtered.map(item => item.timestamp);
+                    const data = filtered.map(item => item.cycletime);
+
+                    const ctx = document.getElementById('cycleTimeChart4_ng').getContext('2d');
+                    if (this.chart4_ng) this.chart4_ng.destroy();
+
+                    this.chart4_ng = new Chart(ctx, {
+                        type: 'line',
+                        data: {
+                            labels: labels.reverse(),
+                            datasets: [{
+                                label: 'Cycle Time (sec)',
+                                data: data.reverse(),
+                                fill: false,
+                                borderColor: 'rgb(75, 192, 192)',
+                                tension: 0.3,
+                                pointRadius: 3,
+                                pointBackgroundColor: '#007bff',
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                        x: { title: { display: true, text: 'timestamp' }},
+                        y: { title: { display: true, text: 'Cycle Time (sec)' }, min: 0, max: 200.0, ticks: { stepSize: 0.5 }}
+                    },
+                    plugins: { legend: { display: true }, tooltip: { mode: 'index', intersect: false }}
+                }
+            });
+        },
+
+                renderChart5: function () {
+    const filtered = this.filterBySelectedDate(this.station5Data); // สำหรับ renderChart5
+    const labels = filtered.map(item => item.timestamp);
+    const data = filtered.map(item => item.cycletime);
+
+    const ctx = document.getElementById('cycleTimeChart5').getContext('2d');
+    if (this.chart5) this.chart5.destroy();
+
+    this.chart5 = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: labels.reverse(),
+            datasets: [{
+                label: 'Cycle Time (sec)',
+                data: data.reverse(),
+                fill: false,
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.3,
+                pointRadius: 3,
+                pointBackgroundColor: '#007bff',
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: { title: { display: true, text: 'timestamp' }},
+                y: { title: { display: true, text: 'Cycle Time (sec)' }, min: 0, max: 200.0, ticks: { stepSize: 0.5 }}
+            },
+            plugins: { legend: { display: true }, tooltip: { mode: 'index', intersect: false }}
+        }
+    });
+}
+,
+                
+
+                logout: function () {
+                    localStorage.removeItem("isLoggedIn");
+                    window.location.href = "login.html";
+                },
+                formatDate: function (dateString) {
+                    const options = { year: "numeric", month: "long", day: "numeric" };
+                    return new Date(dateString).toLocaleDateString("en-US", options);
+                },
+                formatDate: function (timeOnly) {
+    // สมมุติใช้วันปัจจุบันรวมกับเวลา (หรือใช้วันที่จาก timestamp ตัวอื่นถ้ามี)
+    const today = new Date(); // หรือดึงวันที่จากข้อมูลจริง
+    const dateStr = today.toISOString().split('T')[0]; // ได้ "YYYY-MM-DD"
+    const fullDateTime = `${dateStr}T${timeOnly}`; // เช่น "2025-05-22T16:22:31"
+
+    const dateObj = new Date(fullDateTime);
+    if (isNaN(dateObj.getTime())) return "Invalid Date";
+
+    return dateObj.toISOString().split('T')[0].replace(/-/g, '/'); // แสดงเป็น "YYYY/MM/DD"
+}
+
+            
+            },
+
+            watch: {
+                        downtimeMinutes: function () {
+                            this.calculateOEE();  // คำนวณ OEE ใหม่เมื่อเวลาหยุดเครื่องมีการเปลี่ยนแปลง
+                        },
+                        selectedDate: function () {
+        this.renderChart();
+        this.renderChart2();
+        this.renderChart3();
+        this.renderChart4_ok();
+        this.renderChart4_ng();
+        this.renderChart5();
+        this.filterByDate(); // ฟังก์ชันกรองตาราง
+        this.calculateOEE(); // เพิ่มอันนี้ไว้ตรงนี้ ✅
+    }
+                    },
+                    
+            computed: {
+  averageCycleTime() {
+    const filtered = this.filterBySelectedDate(this.allData);
+    if (filtered.length === 0) return 0;
+    const totalCycleTime = filtered.reduce((sum, item) => sum + parseFloat(item.cycletime), 0);
+    return totalCycleTime / filtered.length;
+  },
+  averageCycleTimeStation2() {
+    const filtered = this.filterBySelectedDate(this.station2Data);
+    if (filtered.length === 0) return 0;
+    const totalCycleTime = filtered.reduce((sum, item) => sum + parseFloat(item.cycletime), 0);
+    return totalCycleTime / filtered.length;
+  },
+  averageCycleTimeStation3() {
+    const filtered = this.filterBySelectedDate(this.station3Data);
+    if (filtered.length === 0) return 0;
+    const totalCycleTime = filtered.reduce((sum, item) => sum + parseFloat(item.cycletime), 0);
+    return totalCycleTime / filtered.length;
+  },
+  averageCycleTimeStation4_ok() {
+    const filtered = this.filterBySelectedDate(this.station4_okData);
+    if (filtered.length === 0) return 0;
+    const totalCycleTime = filtered.reduce((sum, item) => sum + parseFloat(item.cycletime), 0);
+    return totalCycleTime / filtered.length;
+  },
+  averageCycleTimeStation4_ng() {
+    const filtered = this.filterBySelectedDate(this.station4_ngData);
+    if (filtered.length === 0) return 0;
+    const totalCycleTime = filtered.reduce((sum, item) => sum + parseFloat(item.cycletime), 0);
+    return totalCycleTime / filtered.length;
+  },
+  averageCycleTimeStation5() {
+    const filtered = this.filterBySelectedDate(this.station5Data);
+    if (filtered.length === 0) return 0;
+    const totalCycleTime = filtered.reduce((sum, item) => sum + parseFloat(item.cycletime), 0);
+    return totalCycleTime / filtered.length;
+  },
+},
+
+            mounted() {
+                this.fetchAllData();
+            },
+            
+            created: function () {
+                this.fetchAllData();
+                Promise.all([
+                  axios.get("http://localhost:3000/station_1_MRP"),
+                  axios.get("http://localhost:3000/station5_MRP")
+                ])
+                  .then(([response1, response5]) => {
+                    this.allData = response1.data;
+                    this.station5Data = response5.data;
+                    this.combineStation1And5(); // จับคู่ข้อมูลเมื่อโหลดครบทั้งสองแล้ว
+                  })
+                  .catch((error) => {
+                    console.error("❌ Error loading station data:", error);
+                  });
+            },
+
+        });
+    </script>
+
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        feather.replace(); // เรียกเพื่อแสดง icon
+    </script>
+</body>
+</html>
