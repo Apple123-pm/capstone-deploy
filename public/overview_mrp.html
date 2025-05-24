@@ -254,7 +254,7 @@ filteredTableData: [], // เก็บข้อมูลที่กรองแ
                 fetchAllData: function () {
                     // Station 1
                     axios
-                      .get("http://localhost:3000/station_1_MRP") // เปลี่ยน URL ให้ตรงกับ API route
+                      .get("https://capstone-deploy-smep.onrender.com/station_1_MRP") // เปลี่ยน URL ให้ตรงกับ API route
                       .then((response) => {
                         this.allData = response.data;
                         this.renderChart(); // เรียกหลังได้ข้อมูล.....................................................
@@ -265,7 +265,7 @@ filteredTableData: [], // เก็บข้อมูลที่กรองแ
 
                       // Station 2
                     axios
-                        .get("http://localhost:3000/station2_MRP") // เปลี่ยน URL ตามจริง
+                        .get("https://capstone-deploy-smep.onrender.com/station2_MRP") // เปลี่ยน URL ตามจริง
                         .then((response) => {
                         this.station2Data = response.data;
                         this.renderChart2(); // แสดงกราฟ Station 2
@@ -276,7 +276,7 @@ filteredTableData: [], // เก็บข้อมูลที่กรองแ
 
                     // Station 3
                     axios
-                        .get("http://localhost:3000/station3_MRP") // เปลี่ยน URL ตามจริง
+                        .get("https://capstone-deploy-smep.onrender.com/station3_MRP") // เปลี่ยน URL ตามจริง
                         .then((response) => {
                         this.station3Data = response.data;
                         this.renderChart3(); // แสดงกราฟ Station 3
@@ -287,7 +287,7 @@ filteredTableData: [], // เก็บข้อมูลที่กรองแ
 
                     // Station 4 ok
                     axios
-                        .get("http://localhost:3000/station4_MRP_OK") // เปลี่ยน URL ตามจริง
+                        .get("https://capstone-deploy-smep.onrender.com/station4_MRP_OK") // เปลี่ยน URL ตามจริง
                         .then((response) => {
                         this.station4_okData = response.data;
                         this.renderChart4_ok(); // แสดงกราฟ Station 4_ok
@@ -298,7 +298,7 @@ filteredTableData: [], // เก็บข้อมูลที่กรองแ
 
                     // Station 4 ng
                     axios
-                        .get("http://localhost:3000/station4_MRP_NG") // เปลี่ยน URL ตามจริง
+                        .get("https://capstone-deploy-smep.onrender.com/station4_MRP_NG") // เปลี่ยน URL ตามจริง
                         .then((response) => {
                         this.station4_ngData = response.data;
                         this.renderChart4_ng(); // แสดงกราฟ Station 4_ng
@@ -309,7 +309,7 @@ filteredTableData: [], // เก็บข้อมูลที่กรองแ
 
                     // Station 5
                     axios
-                        .get("http://localhost:3000/station5_MRP") // เปลี่ยน URL ตามจริง
+                        .get("https://capstone-deploy-smep.onrender.com/station5_MRP") // เปลี่ยน URL ตามจริง
                         .then((response) => {
                         this.station5Data = response.data;
                         this.renderChart5(); // แสดงกราฟ Station 5
@@ -426,7 +426,7 @@ filteredTableData: [], // เก็บข้อมูลที่กรองแ
 
                   fetchStation5Data: function () {
                     axios
-                      .get("http://localhost:3000/station5_MRP") // เปลี่ยน URL ให้ตรงกับ API
+                      .get("https://capstone-deploy-smep.onrender.com/station5_MRP") // เปลี่ยน URL ให้ตรงกับ API
                       .then((response) => {
                         this.station5Data = response.data;
                         this.combineStation1And5(); // เรียกฟังก์ชันรวมข้อมูลหลังโหลดเสร็จ
@@ -766,8 +766,8 @@ filteredTableData: [], // เก็บข้อมูลที่กรองแ
             created: function () {
                 this.fetchAllData();
                 Promise.all([
-                  axios.get("http://localhost:3000/station_1_MRP"),
-                  axios.get("http://localhost:3000/station5_MRP")
+                  axios.get("https://capstone-deploy-smep.onrender.com/station_1_MRP"),
+                  axios.get("https://capstone-deploy-smep.onrender.com/station5_MRP")
                 ])
                   .then(([response1, response5]) => {
                     this.allData = response1.data;

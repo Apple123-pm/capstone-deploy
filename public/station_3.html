@@ -155,7 +155,7 @@
             methods: {
                 fetchAllData: function () {
                     axios
-                      .get("http://localhost:3000/station3_MRP") // เปลี่ยน URL ให้ตรงกับ API route
+                      .get("https://capstone-deploy-smep.onrender.com/station3_MRP") // เปลี่ยน URL ให้ตรงกับ API route
                       .then((response) => {
                         this.allData = response.data;
                         this.filteredData = this.allData; // ตั้งค่าเริ่มต้น

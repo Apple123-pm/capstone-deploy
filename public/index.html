@@ -164,7 +164,7 @@
             methods: {
                 fetchAllData: function () {
                     axios
-                        .get("http://localhost:3000/fetchall")
+                        .get("https://capstone-deploy-smep.onrender.com/fetchall")
                         .then((response) => {
                             this.allData = response.data;
                             console.log("✅ Data fetched:", this.allData);

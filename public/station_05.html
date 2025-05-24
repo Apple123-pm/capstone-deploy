@@ -170,7 +170,7 @@
             methods: {
                 fetchAllData: function () {
                     axios
-                      .get("http://localhost:3000/station5_CONWIP") // เปลี่ยน URL ให้ตรงกับ API route
+                      .get("https://capstone-deploy-smep.onrender.com/station5_CONWIP") // เปลี่ยน URL ให้ตรงกับ API route
                       .then((response) => {
                         this.allData = response.data;
                         this.filteredData = this.allData; // ตั้งค่าเริ่มต้น
@@ -267,7 +267,7 @@
 
 
                 fetchAValue: function () {
-                    axios.get("http://localhost:3000/api/a-value")
+                    axios.get("https://capstone-deploy-smep.onrender.com/api/a-value")
                       .then((response) => {
                         this.aValue = response.data.aValue;
                       })
@@ -277,7 +277,7 @@
                   },
                   
                   fetchBValue: function () {
-                    axios.get("http://localhost:3000/api/b-value")
+                    axios.get("https://capstone-deploy-smep.onrender.com/api/b-value")
                       .then((response) => {
                         this.bValue = response.data.bValue;
                       })
