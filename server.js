@@ -85,6 +85,16 @@ const fetchStationData = (stationName) => (req, res) => {
 };
 
 // เพิ่ม API สำหรับแต่ละ Station
+app.get("/", (req, res) => {
+  res.send(`
+    <h2>✅ Capstone API is running!</h2>
+    <ul>
+      <li><a href="/api/a-value">/api/a-value</a></li>
+      <li><a href="/station1_CONWIP">/station1_CONWIP</a></li>
+      <li><a href="/available-dates">/available-dates</a></li>
+    </ul>
+  `);
+});
 app.get("/station_1_MRP", fetchStationData("Station_1_MRP"));
 app.get("/station2_MRP", fetchStationData("Station_2_MRP"));
 app.get("/station3_MRP", fetchStationData("Station_3_MRP"));
