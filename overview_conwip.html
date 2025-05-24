@@ -299,7 +299,7 @@
                 fetchAllData: function () {
                     // Station 1
                     axios
-                      .get("http://localhost:3000/station1_CONWIP") // เปลี่ยน URL ให้ตรงกับ API route
+                      .get("https://capstone-deploy-smep.onrender.com/station1_CONWIP") // เปลี่ยน URL ให้ตรงกับ API route
                       .then((response) => {
                         this.allData = response.data;
                         this.filteredAllData = this.allData;
@@ -311,7 +311,7 @@
 
                       // Station 2
                     axios
-                        .get("http://localhost:3000/station2_CONWIP") // เปลี่ยน URL ตามจริง
+                        .get("https://capstone-deploy-smep.onrender.com/station2_CONWIP") // เปลี่ยน URL ตามจริง
                         .then((response) => {
                         this.station2Data = response.data;
                         this.filteredStation2Data = this.station2Data;
@@ -323,7 +323,7 @@
 
                     // Station 3
                     axios
-                        .get("http://localhost:3000/station3_CONWIP") // เปลี่ยน URL ตามจริง
+                        .get("https://capstone-deploy-smep.onrender.com/station3_CONWIP") // เปลี่ยน URL ตามจริง
                         .then((response) => {
                         this.station3Data = response.data;
                         this.filteredStation3Data = this.station3Data;
@@ -335,7 +335,7 @@
 
                     // Station 4 ok
                     axios
-                        .get("http://localhost:3000/station4_CONWIP_OK") // เปลี่ยน URL ตามจริง
+                        .get("https://capstone-deploy-smep.onrender.com/station4_CONWIP_OK") // เปลี่ยน URL ตามจริง
                         .then((response) => {
                         this.station4_okData = response.data;
                         this.filteredStation4_okData = this.station4_okData;
@@ -347,7 +347,7 @@
 
                     // Station 4 ng
                     axios
-                        .get("http://localhost:3000/station4_CONWIP_NG") // เปลี่ยน URL ตามจริง
+                        .get("https://capstone-deploy-smep.onrender.com/station4_CONWIP_NG") // เปลี่ยน URL ตามจริง
                         .then((response) => {
                         this.station4_ngData = response.data;
                         this.filteredStation4_ngData = this.station4_ngData;
@@ -359,7 +359,7 @@
 
                     // Station 5
                     axios
-                        .get("http://localhost:3000/station5_CONWIP") // เปลี่ยน URL ตามจริง
+                        .get("https://capstone-deploy-smep.onrender.com/station5_CONWIP") // เปลี่ยน URL ตามจริง
                         .then((response) => {
                         this.station5Data = response.data;
                         this.filteredStation5Data = this.station5Data;
@@ -498,7 +498,7 @@ this.renderAllCharts();
 
                   fetchStation5Data: function () {
                     axios
-                      .get("http://localhost:3000/station5_CONWIP") // เปลี่ยน URL ให้ตรงกับ API
+                      .get("https://capstone-deploy-smep.onrender.com/station5_CONWIP") // เปลี่ยน URL ให้ตรงกับ API
                       .then((response) => {
                         this.station5Data = response.data;
                         this.combineStation1And5(); // เรียกฟังก์ชันรวมข้อมูลหลังโหลดเสร็จ
@@ -868,8 +868,8 @@ this.renderAllCharts();
             created: function () {
                 this.fetchAllData();
                 Promise.all([
-                  axios.get("http://localhost:3000/station1_CONWIP"),
-                  axios.get("http://localhost:3000/station5_CONWIP")
+                  axios.get("https://capstone-deploy-smep.onrender.com/station1_CONWIP"),
+                  axios.get("https://capstone-deploy-smep.onrender.com/station5_CONWIP")
                 ])
                   .then(([response1, response5]) => {
                     this.allData = response1.data;
