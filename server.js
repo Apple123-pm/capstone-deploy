@@ -118,11 +118,12 @@ app.get('/api/b-value', (req, res) => {
 
 // ตัวอย่าง Express API
 app.get("/available-dates", async (req, res) => {
-    const [rows] = await db.query(`
-        SELECT DISTINCT DATE(timestamp) AS date
-        FROM station1_CONWIP
-        ORDER BY date DESC
-    `);
+    const [rows] = await db.promise().query(`
+      SELECT DISTINCT DATE(timestamp) AS date
+      FROM station1_CONWIP
+      ORDER BY date DESC
+`);
+
     const dates = rows.map(r => r.date.toISOString().slice(0, 10));
     res.json(dates);
 });
