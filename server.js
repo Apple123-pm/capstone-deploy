@@ -13,10 +13,10 @@ const mqtt = require("mqtt");
 let a = 0;
 let b = 0;
 
-const client = mqtt.connect('mqtts://c2fc8627c3e04cbabc2a46e56ffabf92.s1.eu.hivemq.cloud', {
-  port: 8883,
-  username: 'CapstoneG04',
-  password: 'CapstoneG04'
+const client = mqtt.connect(process.env.MQTT_HOST, {
+  port: parseInt(process.env.MQTT_PORT, 10),
+  username: process.env.MQTT_USERNAME,
+  password: process.env.MQTT_PASSWORD
 });
 
 client.on('connect', () => {
@@ -46,12 +46,12 @@ app.use(bodyParser.json());
 
 // ใช้ createPool แทน createConnection
 const db = mysql.createPool({
-  host: "srv1630.hstgr.io",
-  user: "u566914236_mae",
-  password: "Conwipsystem01",
-  database: "u566914236_conwip",
+  host: process.env.DB_HOST,
+  user: process.env.DB_USER,
+  password: process.env.DB_PASSWORD,
+  database: process.env.DB_NAME,
   waitForConnections: true,
-  connectionLimit: 10, // เพิ่มจำนวน Connection ที่รองรับ
+  connectionLimit: 10,
   queueLimit: 0,
 });
 
