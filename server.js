@@ -120,7 +120,7 @@ app.get('/api/b-value', (req, res) => {
 app.get("/available-dates", async (req, res) => {
     const [rows] = await db.promise().query(`
       SELECT DISTINCT DATE(timestamp) AS date
-      FROM station1_CONWIP
+      FROM Station_1
       ORDER BY date DESC
 `);
 
