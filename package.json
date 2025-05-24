@@ -16,7 +16,7 @@
     "express": "^4.21.2",
     "modbus-serial": "^8.0.20-no-serial-port",
     "mqtt": "^5.13.0",
-    "mysql2": "^3.12.0",
+    "mysql2": "^3.14.1",
     "vue": "^3.2.13"
   },
   "devDependencies": {
@@ -43,7 +43,7 @@
     "rules": {}
   },
   "description": "## Project setup ``` npm install ```",
-  "main": "babel.config.js",
+  "main": "server.js",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/Apple123-pm/conwip.git"
