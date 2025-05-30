@@ -172,7 +172,8 @@
 
                 <div class="form-group mt-4">
   <label for="filterDate">กรองตามวันที่:</label>
-  <input type="date" id="filterDate" v-model="selectedDate" class="form-control" @change="filterByDate">
+  <input type="date" id="filterDate" class="form-control" v-model="selectedDate" @change="filterDataByDate">
+
 </div>
 
 
@@ -199,7 +200,8 @@
                               <tbody>
                                 <tr v-for="row in filteredTableData" :key="row.timestamp_station1">
                                     <td class="text-center" class="col-No">{{ row.timestamp_station1_No}}</td>
-                                    <td class="text-center">{{ formatDate(row.timestamp_station1) }}</td> <!-- 👈 เพิ่มตรงนี้ -->
+                                    <!-- <td class="text-center">{{ formatDate(row.timestamp_station1) }}</td> 👈 เพิ่มตรงนี้ -->
+                                    <td class="text-center">{{ formatDateYMD(row.date) }}</td>
                                     <td class="text-center">{{ row.timestamp_station1_in }}</td>
                                     <td class="text-center">{{ row.timestamp_station1 }}</td>
                                     <td class="text-center">{{ row.timestamp_station2_in }}</td>
@@ -246,7 +248,14 @@
                 performance: 0,
                 quality: 0,
                 selectedDate: '', // วันที่ที่เลือก
-filteredTableData: [], // เก็บข้อมูลที่กรองแล้ว
+                filteredTableData: [], // เก็บข้อมูลที่กรองแล้ว
+                filteredAllData: [],
+                filteredStation2Data: [],
+                filteredStation3Data: [],
+                filteredStation4_okData: [],
+                filteredStation4_ngData: [],
+                filteredStation5Data: [],
+                chart1: null, // ✅ เพิ่ม chart1
 
                 
             },
@@ -317,129 +326,166 @@ filteredTableData: [], // เก็บข้อมูลที่กรองแ
                     .catch((error) => {
                         console.error("❌ Error fetching Station 5 data:", error);
                     });
+                    this.filteredAllData = this.allData;
+                    this.filteredStation2Data = this.station2Data;
+                    this.filteredStation3Data = this.station3Data;
+                    this.filteredStation4_okData = this.station4_okData;
+                    this.filteredStation4_ngData = this.station4_ngData;
+                    this.filteredStation5Data = this.station5Data;
+                    this.renderAllCharts();
 
                     
                   },
+                  formatDateYMD(dateString) {
+  const date = new Date(dateString);
+  return date.toISOString().split("T")[0]; // "YYYY-MM-DD"
+}
+,
 
-                  filterByDate() {
+                  filterDataByDate: function () {
                     if (!this.selectedDate) {
                         this.filteredTableData = this.combinedTableData;
-                    return;
-                }
+                        return;
+                    }
 
-                    const selected = this.selectedDate;
-                    this.filteredTableData = this.combinedTableData.filter(item => {
-                    const formatted = this.formatDate(item.timestamp_station1); // ใช้ฟังก์ชันที่มีอยู่แล้ว
-                    return formatted === selected.replace(/-/g, '/'); // เปรียบเทียบเป็น "YYYY/MM/DD"
-                });
-            },
+                    this.filteredTableData = this.combinedTableData.filter((item) => {
+                        const itemDate = new Date(item.date).toISOString().split("T")[0];
+                        return itemDate === this.selectedDate;
+                    });
 
-                filterBySelectedDate(dataArray) {
-                if (!this.selectedDate) return dataArray;
-
-                const selected = this.selectedDate.replace(/-/g, '/'); // เปรียบเทียบเป็น "YYYY/MM/DD"
-
-                return dataArray.filter(item => {
-                const formatted = this.formatDate(item.timestamp); // หรือ item.timestamp_station1
-                return formatted === selected;
-                });
+                    console.log("📅 Filtered by date:", this.selectedDate, this.filteredTableData);
                 },
 
-                filterAllDataBySelectedDate() {
+                filterDataByDate: function () {
                     if (!this.selectedDate) {
-        // 👉 ถ้ายังไม่เลือกวันที่ ให้ใช้ข้อมูลทั้งหมด
-        return {
-            allData: this.allData,
-            station2Data: this.station2Data,
-            station3Data: this.station3Data,
-            station4_okData: this.station4_okData,
-            station4_ngData: this.station4_ngData,
-            station5Data: this.station5Data,
-        };
-    }
-                    const date = this.selectedDate.replace(/-/g, '/'); // "YYYY/MM/DD"
-                    const formatFn = this.formatDate;
+    this.filteredTableData = this.combinedTableData;
+    this.filteredAllData = this.allData;
+    this.filteredStation2Data = this.station2Data;
+    this.filteredStation3Data = this.station3Data;
+    this.filteredStation4_okData = this.station4_okData;
+    this.filteredStation4_ngData = this.station4_ngData;
+    this.filteredStation5Data = this.station5Data;
+    this.renderAllCharts();
+    return;
+}
 
-                    const filterFn = (arr) => {
-                        return arr.filter(item => formatFn(item.timestamp || item.start_time) === date);
-                    };
+                    const selected = new Date(this.selectedDate).toISOString().split("T")[0];
 
-                    return {
-                        allData: filterFn(this.allData),
-                        station2Data: filterFn(this.station2Data),
-                        station3Data: filterFn(this.station3Data),
-                        station4_okData: filterFn(this.station4_okData),
-                        station4_ngData: filterFn(this.station4_ngData),
-                        station5Data: filterFn(this.station5Data)
-                    };
+                    this.filteredTableData = this.combinedTableData.filter((item) => {
+                        const itemDate = new Date(item.date).toISOString().split("T")[0];
+                        return itemDate === selected;
+                    });
+
+                    // ✅ กรองกราฟด้วย
+                    this.filteredAllData = this.allData.filter(item => item.date && item.date.startsWith(selected));
+                    this.filteredStation2Data = this.station2Data.filter(item => item.date && item.date.startsWith(selected));
+                    this.filteredStation3Data = this.station3Data.filter(item => item.date && item.date.startsWith(selected));
+                    this.filteredStation4_okData = this.station4_okData.filter(item => item.date && item.date.startsWith(selected));
+                    this.filteredStation4_ngData = this.station4_ngData.filter(item => item.date && item.date.startsWith(selected));
+                    this.filteredStation5Data = this.station5Data.filter(item => item.date && item.date.startsWith(selected));
+
+                    this.renderAllCharts(); // รีเฟรชกราฟทั้งหมด
                 },
+                filterBySelectedDate(dataArray) {
+  if (!this.selectedDate) return dataArray;
+  const selected = new Date(this.selectedDate).toISOString().split("T")[0];
+  return dataArray.filter(item => item.date && item.date.startsWith(selected));
+}
+,
+
+                renderAllCharts() {
+                    this.renderChart(this.filteredAllData);       // Station 1
+                    this.renderChart2(this.filteredStation2Data); // Station 2
+                    this.renderChart3(this.filteredStation3Data); // Station 3
+                    this.renderChart4_ok(this.filteredStation4_okData); // Station 4 OK
+                    this.renderChart4_ng(this.filteredStation4_ngData); // Station 4 NG
+                    this.renderChart5(this.filteredStation5Data); // Station 5
+    },
+
 
                   
 
                   calculateOEE: function () {
-    const plannedProductionTime = 7 * 60 * 60; // 7 ชั่วโมง
-    const downtimeSeconds = this.downtimeMinutes * 60;
-    const runTime = plannedProductionTime - downtimeSeconds;
+ 
+                    const plannedProductionTime = 7 * 60 * 60; // 7 ชั่วโมงในวินาที
+                    const downtimeSeconds = this.downtimeMinutes * 60;
+                    const runTime = plannedProductionTime - downtimeSeconds;
 
-    // 👇 กรองข้อมูลตามวันที่
-    const {
-        allData,
-        station2Data,
-        station3Data,
-        station4_okData,
-        station4_ngData,
-        station5Data
-    } = this.filterAllDataBySelectedDate();
+                    // รวม cycle time ของทุก station
+                    const allCycleData = [
+    ...this.filteredAllData,
+    ...this.filteredStation2Data,
+    ...this.filteredStation3Data,
+    ...this.filteredStation4_okData,
+    ...this.filteredStation4_ngData,
+    ...this.filteredStation5Data
+];
 
-    const allCycleData = [
-        ...allData,
-        ...station2Data,
-        ...station3Data,
-        ...station4_okData,
-        ...station4_ngData,
-        ...station5Data
-    ];
+                    // คำนวณ totalCycleTime โดยตรวจสอบว่า cycletime มีค่าจริงและแปลงเป็นตัวเลข
+                    const totalCycleTime = allCycleData.reduce((sum, item) => {
+                        const cycleTime = parseFloat(item.cycletime);
+                        return sum + (isNaN(cycleTime) ? 0 : cycleTime);
+                    }, 0);
 
-    const totalCycleTime = allCycleData.reduce((sum, item) => {
-        const cycleTime = parseFloat(item.cycletime);
-        return sum + (isNaN(cycleTime) ? 0 : cycleTime);
-    }, 0);
+                    const allStations = [
+                    this.filteredAllData,
+                    this.filteredStation2Data,
+                    this.filteredStation3Data,
+                    this.filteredStation4_okData,
+                    this.filteredStation4_ngData,
+                    this.filteredStation5Data
+                    ];
 
-    const totalUnits = station4_okData.length + station4_ngData.length;
-    const goodUnits = station4_okData.length;
-    const idealCycleTime = 130.2;
+                    const allUnits = Math.max(...allStations.map(station => station.length));
 
-    const availabilityRaw = plannedProductionTime > 0 ? runTime / plannedProductionTime : 0;
-    const performanceRaw = runTime > 0 ? (totalUnits * idealCycleTime) / runTime : 0;
-    const qualityRaw = totalUnits > 0 ? goodUnits / totalUnits : 0;
+                    const totalUnits = this.filteredStation4_okData.length + this.filteredStation4_ngData.length;
+                    const goodUnits = this.filteredStation4_okData.length;
 
-    this.availability = availabilityRaw * 100;
-    this.performance = Math.max(0, performanceRaw * 100);
-    this.quality = qualityRaw * 100;
-    this.oee = availabilityRaw * performanceRaw * qualityRaw * 100;
+                    const idealCycleTime = 130.2; // วินาทีต่อหน่วย
+
+                    // ป้องกันหารศูนย์
+                    const availabilityRaw = plannedProductionTime > 0 ? runTime / plannedProductionTime : 0;
+                    const performanceRaw = runTime > 0 ? (totalUnits * idealCycleTime) / runTime : 0;
+                    const qualityRaw = totalUnits > 0 ? goodUnits / totalUnits : 0;
+
+                    
+
+                    // เก็บไว้ในรูป %
+                    this.availability = availabilityRaw * 100;
+                    this.performance = Math.min(performanceRaw * 100, 100);
+                    this.quality = qualityRaw * 100;
+
+                    this.oee = availabilityRaw * performanceRaw * qualityRaw * 100;
 
                     console.log("Availability:", this.availability.toFixed(2), "%");
                     console.log("Performance:", this.performance.toFixed(2), "%");
                     console.log("Quality:", this.quality.toFixed(2), "%");
-                    console.log("📅 [Filtered Date] OEE:", this.oee.toFixed(2));
+                    console.log("OEE:", this.oee.toFixed(2), "%");
                     },
+                    
+
 
                   fetchStation5Data: function () {
                     axios
-                      .get("https://capstone-deploy-smep.onrender.com/station5_MRP") // เปลี่ยน URL ให้ตรงกับ API
+                      .get("http://localhost:3000/station5_CONWIP") // เปลี่ยน URL ให้ตรงกับ API
                       .then((response) => {
                         this.station5Data = response.data;
                         this.combineStation1And5(); // เรียกฟังก์ชันรวมข้อมูลหลังโหลดเสร็จ
+                        this.filteredTableData = this.combinedTableData;
+                        console.log("✅ Combined rows:", this.combinedTableData.length);
+                        console.table(this.combinedTableData);
+
+
                       })
                       .catch((error) => {
                         console.error("❌ Error fetching Station 5 data:", error);
                       });
+
+                      
                 },
                 
                 combineStation1And5: function () {
                     this.combinedTableData = [];
-                    this.filteredTableData = this.combinedTableData; // ตั้งค่าเริ่มต้น
-
                   
                     // สร้าง Map จาก No เพื่อ lookup ข้อมูลเร็ว
                     const mapStation1 = new Map(this.allData.map(item => [item.No, item]));
@@ -459,6 +505,7 @@ filteredTableData: [], // เก็บข้อมูลที่กรองแ
                       if (station1 && station2 && station3 && station4 && station5) {
                         this.combinedTableData.push({
                           timestamp_station1_No: No,
+                          date: station1.date, // ✅ เพิ่มบรรทัดนี้
                           timestamp_station1_in: station1.start_time,
                           timestamp_station1: station1.timestamp,
                           timestamp_station2_in: station2.start_time,
@@ -689,18 +736,7 @@ filteredTableData: [], // เก็บข้อมูลที่กรองแ
                     const options = { year: "numeric", month: "long", day: "numeric" };
                     return new Date(dateString).toLocaleDateString("en-US", options);
                 },
-                formatDate: function (timeOnly) {
-    // สมมุติใช้วันปัจจุบันรวมกับเวลา (หรือใช้วันที่จาก timestamp ตัวอื่นถ้ามี)
-    const today = new Date(); // หรือดึงวันที่จากข้อมูลจริง
-    const dateStr = today.toISOString().split('T')[0]; // ได้ "YYYY-MM-DD"
-    const fullDateTime = `${dateStr}T${timeOnly}`; // เช่น "2025-05-22T16:22:31"
-
-    const dateObj = new Date(fullDateTime);
-    if (isNaN(dateObj.getTime())) return "Invalid Date";
-
-    return dateObj.toISOString().split('T')[0].replace(/-/g, '/'); // แสดงเป็น "YYYY/MM/DD"
-}
-
+                
             
             },
 
@@ -708,16 +744,12 @@ filteredTableData: [], // เก็บข้อมูลที่กรองแ
                         downtimeMinutes: function () {
                             this.calculateOEE();  // คำนวณ OEE ใหม่เมื่อเวลาหยุดเครื่องมีการเปลี่ยนแปลง
                         },
-                        selectedDate: function () {
-        this.renderChart();
-        this.renderChart2();
-        this.renderChart3();
-        this.renderChart4_ok();
-        this.renderChart4_ng();
-        this.renderChart5();
-        this.filterByDate(); // ฟังก์ชันกรองตาราง
-        this.calculateOEE(); // เพิ่มอันนี้ไว้ตรงนี้ ✅
-    }
+                        
+    
+    selectedDate() {
+    this.filterDataByDate();
+    this.calculateOEE();
+  }
                     },
                     
             computed: {
@@ -763,21 +795,29 @@ filteredTableData: [], // เก็บข้อมูลที่กรองแ
                 this.fetchAllData();
             },
             
-            created: function () {
-                this.fetchAllData();
+            created() {
                 Promise.all([
-                  axios.get("https://capstone-deploy-smep.onrender.com/station_1_MRP"),
-                  axios.get("https://capstone-deploy-smep.onrender.com/station5_MRP")
+                    axios.get("https://capstone-deploy-smep.onrender.com/station_1_MRP"),
+                    axios.get("https://capstone-deploy-smep.onrender.com/station2_MRP"),
+                    axios.get("https://capstone-deploy-smep.onrender.com/station3_MRP"),
+                    axios.get("https://capstone-deploy-smep.onrender.com/station4_MRP_OK"),
+                    axios.get("https://capstone-deploy-smep.onrender.com/station4_MRP_NG"),  // ✅ เพิ่มอันนี้
+                    axios.get("https://capstone-deploy-smep.onrender.com/station5_MRP")
                 ])
-                  .then(([response1, response5]) => {
-                    this.allData = response1.data;
-                    this.station5Data = response5.data;
-                    this.combineStation1And5(); // จับคู่ข้อมูลเมื่อโหลดครบทั้งสองแล้ว
-                  })
-                  .catch((error) => {
-                    console.error("❌ Error loading station data:", error);
-                  });
-            },
+                .then(([res1, res2, res3, res4, res4ng, res5]) => {
+                    this.allData = res1.data;
+                    this.station2Data = res2.data;
+                    this.station3Data = res3.data;
+                    this.station4_okData = res4.data;
+                    this.station4_ngData = res4ng.data; // ✅ เพิ่มอันนี้
+                    this.station5Data = res5.data;
+
+                    this.combineStation1And5(); // รวมข้อมูล
+                    this.filteredTableData = this.combinedTableData; // แสดงในตาราง
+                    this.filterDataByDate(); // กรองด้วยวันที่
+            })
+            .catch(err => console.error("❌ Error loading data:", err));
+        },
 
         });
     </script>
